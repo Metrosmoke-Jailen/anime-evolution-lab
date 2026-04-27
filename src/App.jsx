@@ -2,6 +2,7 @@ import CharacterSearchBar from "./components/CharacterSearchBar";
 import GrowthSlider from "./components/GrowthSlider";
 import EvolutionTimeline from "./components/EvolutionTimeline";
 import CharacterCardPreview from "./components/CharacterCardPreview";
+import CharacterResults from "./components/CharacterResults";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
 
       <CharacterSearchBar />
       <GrowthSlider />
+      <CharacterResults />
       <CharacterCardPreview />
       <EvolutionTimeline />
     </div>

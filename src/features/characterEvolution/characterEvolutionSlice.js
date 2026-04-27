@@ -1,9 +1,21 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { searchCharacters } from "../../services/jikanApi";
+
+export const fetchCharacters = createAsyncThunk(
+  "characterEvolution/fetchCharacters",
+  async (query, thunkAPI) => {
+    try {
+      return await searchCharacters(query);
+    } catch {
+      return thunkAPI.rejectWithValue("API failed");
+    }
+  }
+);
 
 const initialState = {
   baseCharacter: null,
-  evolutionTimeline: [],
-  status: "idle", // idle | loading | success | error
+  characterResults: [],
+  status: "idle",
   error: null,
   growthIntensity: 50,
 };
@@ -12,34 +24,24 @@ const characterEvolutionSlice = createSlice({
   name: "characterEvolution",
   initialState,
   reducers: {
-    setBaseCharacter: (state, action) => {
-      state.baseCharacter = action.payload;
-    },
-    setEvolutionTimeline: (state, action) => {
-      state.evolutionTimeline = action.payload;
-      state.status = "success";
-    },
-    setLoading: (state) => {
-      state.status = "loading";
-    },
-    setError: (state, action) => {
-      state.status = "error";
-      state.error = action.payload;
-    },
     setGrowthIntensity: (state, action) => {
       state.growthIntensity = action.payload;
     },
-    resetEvolution: () => initialState,
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCharacters.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCharacters.fulfilled, (state, action) => {
+        state.status = "success";
+        state.characterResults = action.payload;
+      })
+      .addCase(fetchCharacters.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 
-export const {
-  setBaseCharacter,
-  setEvolutionTimeline,
-  setLoading,
-  setError,
-  setGrowthIntensity,
-  resetEvolution,
-} = characterEvolutionSlice.actions;
-
+export const { setGrowthIntensity } = characterEvolutionSlice.actions;
 export default characterEvolutionSlice.reducer;
