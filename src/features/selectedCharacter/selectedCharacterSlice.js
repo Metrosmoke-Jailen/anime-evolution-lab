@@ -13,11 +13,21 @@ const selectedCharacterSlice = createSlice({
     setQuery: (state, action) => {
       state.query = action.payload;
     },
+    setSelectedAnime: (state, action) => {
+      state.selectedAnime = action.payload;
+    },
     setSelectedCharacter: (state, action) => {
       state.selectedCharacter = action.payload;
     },
+    resetSelection: () => initialState,
   },
 });
 
-export const { setQuery, setSelectedCharacter } = selectedCharacterSlice.actions;
+export const {
+  setQuery,
+  setSelectedAnime,
+  setSelectedCharacter,
+  resetSelection,
+} = selectedCharacterSlice.actions;
+
 export default selectedCharacterSlice.reducer;
