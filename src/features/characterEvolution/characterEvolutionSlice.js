@@ -1,47 +1,80 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { searchCharacters } from "../../services/jikanApi";
+import { searchCharacters, getCharacterAnime } from "../../services/jikanApi";
+import { generateEvolutionTimeline } from "../../utils/evolutionEngine";
 
 export const fetchCharacters = createAsyncThunk(
-  "characterEvolution/fetchCharacters",
+  "evolution/search",
   async (query, thunkAPI) => {
     try {
       return await searchCharacters(query);
     } catch {
-      return thunkAPI.rejectWithValue("API failed");
+      return thunkAPI.rejectWithValue("Search failed");
     }
   }
 );
 
-const initialState = {
-  baseCharacter: null,
-  characterResults: [],
-  status: "idle",
-  error: null,
-  growthIntensity: 50,
-};
+export const buildEvolution = createAsyncThunk(
+  "evolution/build",
+  async ({ characterId, intensity, alternate }, thunkAPI) => {
+    try {
+      const anime = await getCharacterAnime(characterId);
+      return generateEvolutionTimeline(anime, intensity, alternate);
+    } catch {
+      return thunkAPI.rejectWithValue("Evolution failed");
+    }
+  }
+);
 
-const characterEvolutionSlice = createSlice({
+const slice = createSlice({
   name: "characterEvolution",
-  initialState,
+  initialState: {
+    characterResults: [],
+    evolutionTimeline: [],
+    status: "idle",
+    error: null,
+    growthIntensity: 50,
+    alternateMode: false,
+  },
   reducers: {
-    setGrowthIntensity: (state, action) => {
-      state.growthIntensity = action.payload;
+    setGrowthIntensity: (s, a) => {
+      s.growthIntensity = a.payload;
+    },
+    toggleAlternateMode: (s) => {
+      s.alternateMode = !s.alternateMode;
+    },
+    loadSaved: (s) => {
+      const saved = JSON.parse(localStorage.getItem("evolutionBuild"));
+      if (saved) s.evolutionTimeline = saved;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchCharacters.pending, (state) => {
-        state.status = "loading";
+  extraReducers: (b) => {
+    b.addCase(fetchCharacters.pending, (s) => {
+      s.status = "loading";
+    })
+      .addCase(fetchCharacters.fulfilled, (s, a) => {
+        s.status = "success";
+        s.characterResults = a.payload;
       })
-      .addCase(fetchCharacters.fulfilled, (state, action) => {
-        state.status = "success";
-        state.characterResults = action.payload;
+      .addCase(fetchCharacters.rejected, (s) => {
+        s.status = "error";
       })
-      .addCase(fetchCharacters.rejected, (state) => {
-        state.status = "error";
+      .addCase(buildEvolution.pending, (s) => {
+        s.status = "loading";
+      })
+      .addCase(buildEvolution.fulfilled, (s, a) => {
+        s.status = "success";
+        s.evolutionTimeline = a.payload;
+      })
+      .addCase(buildEvolution.rejected, (s) => {
+        s.status = "error";
       });
   },
 });
 
-export const { setGrowthIntensity } = characterEvolutionSlice.actions;
-export default characterEvolutionSlice.reducer;
+export const {
+  setGrowthIntensity,
+  toggleAlternateMode,
+  loadSaved,
+} = slice.actions;
+
+export default slice.reducer;

@@ -1,41 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-  currentFrame: 0,
-  isPlaying: false,
-  speed: 1,
-};
-
-const timelineSlice = createSlice({
+const slice = createSlice({
   name: "timeline",
-  initialState,
+  initialState: {
+    currentFrame: 0,
+    isPlaying: false,
+    speed: 1,
+  },
   reducers: {
-    setFrame: (state, action) => {
-      state.currentFrame = action.payload;
+    setFrame: (s, a) => {
+      s.currentFrame = a.payload;
     },
-    nextFrame: (state) => {
-      state.currentFrame += 1;
+    nextFrame: (s) => {
+      s.currentFrame += 1;
     },
-    prevFrame: (state) => {
-      state.currentFrame = Math.max(0, state.currentFrame - 1);
+    prevFrame: (s) => {
+      s.currentFrame = Math.max(0, s.currentFrame - 1);
     },
-    togglePlay: (state) => {
-      state.isPlaying = !state.isPlaying;
+    togglePlay: (s) => {
+      s.isPlaying = !s.isPlaying;
     },
-    setSpeed: (state, action) => {
-      state.speed = action.payload;
-    },
-    resetTimeline: () => initialState,
   },
 });
 
-export const {
-  setFrame,
-  nextFrame,
-  prevFrame,
-  togglePlay,
-  setSpeed,
-  resetTimeline,
-} = timelineSlice.actions;
-
-export default timelineSlice.reducer;
+export const { setFrame, nextFrame, prevFrame, togglePlay } = slice.actions;
+export default slice.reducer;
