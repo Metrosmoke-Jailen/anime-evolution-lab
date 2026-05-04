@@ -8,7 +8,8 @@ export default function CharacterCardPreview() {
 
   if (!char || !timeline.length) return null;
 
-  const current = timeline[frame];
+  const current = timeline[frame] || timeline[0];
+  if (!current) return null;
 
   return (
     <motion.div key={frame} className="p-4">

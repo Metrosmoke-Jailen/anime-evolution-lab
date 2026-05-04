@@ -1,25 +1,41 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  togglePlay,
-  nextFrame,
-  prevFrame,
-  setFrame,
-} from "../features/timeline/timelineSlice";
-import {
-  toggleAlternateMode,
-  loadSaved,
-} from "../features/characterEvolution/characterEvolutionSlice";
-
+import { togglePlay, nextFrame, prevFrame, setFrame } from "../features/timeline/timelineSlice";
+import { toggleAlternateMode,loadSaved, buildPredictions, buildEvolution } from "../features/characterEvolution/characterEvolutionSlice";
 export default function TimelineControls() {
   const dispatch = useDispatch();
   const { currentFrame, isPlaying } = useSelector((s) => s.timeline);
   const length = useSelector((s) => s.characterEvolution.evolutionTimeline.length);
 
-  const timeline = useSelector((s) => s.characterEvolution.evolutionTimeline);
+  const timeline = useSelector(
+    (s) => s.characterEvolution.evolutionTimeline
+  );
 
   const save = () => {
+    if (!timeline.length) return;
+
     localStorage.setItem("evolutionBuild", JSON.stringify(timeline));
+
+    dispatch(buildPredictions({ timeline, intensity }));
+
+    alert("🧬 Evolution saved!");
   };
+  
+  const intensity = useSelector(
+    (s) => s.characterEvolution.growthIntensity
+  );
+
+  const triggerPrediction = () => {
+    if (timeline.length > 0) {
+      dispatch(buildPredictions({ timeline, intensity }));
+    }
+  };
+
+  const selectedCharacter = useSelector(
+    (s) => s.selectedCharacter.selectedCharacter
+  );
+  const alternateMode = useSelector(
+    (s) => s.characterEvolution.alternateMode
+  );
 
   return (
     <div className="p-4 space-y-2">
@@ -41,11 +57,59 @@ export default function TimelineControls() {
       />
 
       <div className="flex gap-2">
-        <button onClick={() => dispatch(toggleAlternateMode())}>
+        <button
+          onClick={() => {
+            dispatch(toggleAlternateMode());
+
+          if (selectedCharacter) {
+            dispatch(
+              buildEvolution({
+                characterId: selectedCharacter.mal_id,
+                intensity,
+                alternate: !alternateMode, // flip it
+              })
+          ).then((res) => {
+          if (res.meta.requestStatus === "fulfilled") {
+            dispatch(
+              buildPredictions({
+                timeline: res.payload,
+                intensity,
+              })
+            );
+          }
+        });
+      }
+    }}
+      >
           🧠 What If
         </button>
-        <button onClick={save}>💾 Save</button>
-        <button onClick={() => dispatch(loadSaved())}>📂 Load</button>
+        
+        <button onClick={() => {localStorage.setItem("evolutionBuild", JSON.stringify(timeline)); triggerPrediction(); }}>
+          💾 Save
+        </button>
+        
+        <button
+          onClick={() => {
+          dispatch(loadSaved());
+
+          setTimeout(() => {
+            const saved = JSON.parse(localStorage.getItem("evolutionBuild")) || [];
+
+          if (saved.length > 0) {
+            dispatch(setFrame(0)); // reset timeline position
+
+            dispatch(
+              buildPredictions({
+                timeline: saved,
+                intensity,
+              })
+            );
+          }
+            }, 100);
+          }}
+          >
+          📂 Load
+        </button>
       </div>
     </div>
   );

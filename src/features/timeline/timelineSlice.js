@@ -20,8 +20,11 @@ const slice = createSlice({
     togglePlay: (s) => {
       s.isPlaying = !s.isPlaying;
     },
+    resetTimeline: (s) => {
+      s.currentFrame = 0;
+    },
   },
 });
 
-export const { setFrame, nextFrame, prevFrame, togglePlay } = slice.actions;
+export const { setFrame, nextFrame, prevFrame, togglePlay, resetTimeline } = slice.actions;
 export default slice.reducer;

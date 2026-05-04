@@ -8,6 +8,7 @@ import GrowthSlider from "./components/GrowthSlider";
 import EvolutionTimeline from "./components/EvolutionTimeline";
 import CharacterCardPreview from "./components/CharacterCardPreview";
 import TimelineControls from "./components/TimelineControls";
+import FutureBranches from "./components/FutureBranches";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ export default function App() {
       <CharacterResults />
       <TimelineControls />
       <CharacterCardPreview />
+      <FutureBranches />
       <EvolutionTimeline />
     </div>
   );

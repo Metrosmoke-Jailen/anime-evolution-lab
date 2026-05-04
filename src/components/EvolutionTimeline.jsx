@@ -9,7 +9,7 @@ export default function EvolutionTimeline() {
     <div className="flex flex-col items-center space-y-10 p-8">
       {evolutionTimeline.map((node, i) => (
         <motion.div
-          key={node.id}
+          key={`${node.id}-${i}`}
           animate={{
             x: i % 2 === 0 ? -40 : 40,
             scale: i === frame ? 1.2 : 1,

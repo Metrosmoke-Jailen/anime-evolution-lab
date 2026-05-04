@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { searchCharacters, getCharacterAnime } from "../../services/jikanApi";
 import { generateEvolutionTimeline } from "../../utils/evolutionEngine";
+import { generateFutureBranches } from "../../utils/predictionEngine";
 
 export const fetchCharacters = createAsyncThunk(
   "evolution/search",
@@ -25,15 +26,28 @@ export const buildEvolution = createAsyncThunk(
   }
 );
 
+export const buildPredictions = createAsyncThunk(
+  "evolution/predict",
+  async ({ timeline, intensity }, thunkAPI) => {
+    try {
+      return generateFutureBranches(timeline, intensity);
+    } catch {
+      return thunkAPI.rejectWithValue("Prediction failed");
+    }
+  }
+);
+
 const slice = createSlice({
   name: "characterEvolution",
   initialState: {
-    characterResults: [],
-    evolutionTimeline: [],
-    status: "idle",
-    error: null,
-    growthIntensity: 50,
-    alternateMode: false,
+  characterResults: [],
+  evolutionTimeline: [],
+  futureBranches: [],
+  selectedFuture: null,
+  status: "idle",
+  error: null,
+  growthIntensity: 50,
+  alternateMode: false,
   },
   reducers: {
     setGrowthIntensity: (s, a) => {
@@ -45,6 +59,9 @@ const slice = createSlice({
     loadSaved: (s) => {
       const saved = JSON.parse(localStorage.getItem("evolutionBuild"));
       if (saved) s.evolutionTimeline = saved;
+    },
+    selectFuture: (s, a) => {
+      s.selectedFuture = a.payload;
     },
   },
   extraReducers: (b) => {
@@ -67,6 +84,9 @@ const slice = createSlice({
       })
       .addCase(buildEvolution.rejected, (s) => {
         s.status = "error";
+      })
+      .addCase(buildPredictions.fulfilled, (s, a) => {
+        s.futureBranches = a.payload;
       });
   },
 });
@@ -75,6 +95,7 @@ export const {
   setGrowthIntensity,
   toggleAlternateMode,
   loadSaved,
+  selectFuture,
 } = slice.actions;
 
 export default slice.reducer;
