@@ -20,6 +20,9 @@ export default function EvolutionTimeline() {
           <div className="bg-gray-900 p-4 rounded-xl border border-purple-500">
             <h3>{node.animeTitle}</h3>
             <p>{node.year}</p>
+            {node.year === "Future" && (
+              <p className="text-xs text-cyan-400">🌿 Branched Timeline</p>
+            )}
             <p>{node.role}</p>
             <p>⚡ {node.powerLevel}</p>
 

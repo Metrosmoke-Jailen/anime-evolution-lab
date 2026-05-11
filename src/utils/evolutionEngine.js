@@ -20,9 +20,10 @@ const maybeMutate = (power) => {
 export const generateEvolutionTimeline = (
   animeList,
   intensity = 50,
-  alternate = false
+  alternate = false,
+  alternateIntensity = 0
 ) => {
-  if (!animeList?.length) return [];
+  if (!animeList || !animeList.length) return [];
 
   const sorted = [...animeList].sort(
     (a, b) => (a.anime.year || 0) - (b.anime.year || 0)
@@ -35,7 +36,8 @@ export const generateEvolutionTimeline = (
     let power = base * scale;
 
     if (alternate) {
-      power += Math.random() * 30;
+      const variation = (Math.random() - 0.5) * alternateIntensity;
+      power += variation;
     }
 
     const mutation = maybeMutate(power);

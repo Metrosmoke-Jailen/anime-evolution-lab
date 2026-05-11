@@ -10,6 +10,8 @@ export const searchCharacters = async (query) => {
 };
 
 export const getCharacterAnime = async (id) => {
-  const res = await axios.get(`${BASE_URL}/characters/${id}/anime`);
-  return res.data.data;
+  const res = await fetch(`https://api.jikan.moe/v4/characters/${id}/anime`);
+  const data = await res.json();
+
+  return data.data || []; 
 };

@@ -2,12 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   buildEvolution,
   buildPredictions,
+  buildMultiverse,
 } from "../features/characterEvolution/characterEvolutionSlice";
 import { setSelectedCharacter } from "../features/selectedCharacter/selectedCharacterSlice";
 
 export default function CharacterResults() {
   const dispatch = useDispatch();
-  const { characterResults, status, growthIntensity, alternateMode } =
+  const { characterResults, status, growthIntensity, alternateMode, alternateIntensity } =
     useSelector((s) => s.characterEvolution);
 
   if (status === "loading") return <p className="p-4">⏳ Loading...</p>;
@@ -25,6 +26,7 @@ export default function CharacterResults() {
           characterId: c.mal_id,
           intensity: growthIntensity,
           alternate: alternateMode,
+          alternateIntensity,
         })
       );
 
@@ -43,6 +45,14 @@ export default function CharacterResults() {
     } catch (err) {
       console.error("Evolution + Prediction failed:", err);
     }
+
+    dispatch(
+      buildMultiverse({
+        characterId: c.mal_id,
+        intensity: growthIntensity,
+        alternate: alternateMode,
+      })
+    );
   };
 
   return (

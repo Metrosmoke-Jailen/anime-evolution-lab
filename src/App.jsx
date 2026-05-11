@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { nextFrame } from "./features/timeline/timelineSlice";
-
 import CharacterSearchBar from "./components/CharacterSearchBar";
 import CharacterResults from "./components/CharacterResults";
 import GrowthSlider from "./components/GrowthSlider";
@@ -9,6 +8,8 @@ import EvolutionTimeline from "./components/EvolutionTimeline";
 import CharacterCardPreview from "./components/CharacterCardPreview";
 import TimelineControls from "./components/TimelineControls";
 import FutureBranches from "./components/FutureBranches";
+import AlternateSlider from "./components/AlternateSlider"
+import MultiverseView from "./components/MultiverseView";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -31,10 +32,12 @@ export default function App() {
 
       <CharacterSearchBar />
       <GrowthSlider />
+      <AlternateSlider />
       <CharacterResults />
       <TimelineControls />
       <CharacterCardPreview />
       <FutureBranches />
+      <MultiverseView />
       <EvolutionTimeline />
     </div>
   );
